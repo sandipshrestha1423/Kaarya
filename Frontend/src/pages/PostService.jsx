@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { getToken } from "../utils/auth";
 
-const PostService = () => {
+function PostService() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",

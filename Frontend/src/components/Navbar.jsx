@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../utils/auth";
 
-const Navbar = () => {
+function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 

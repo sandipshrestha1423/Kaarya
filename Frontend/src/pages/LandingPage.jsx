@@ -1,12 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const LandingPage = () => {
+function LandingPage() {
   return (
       <div className="flex flex-col min-h-screen">
       
 
-      <section className="flex flex-col items-center justify-center text-center bg-linear-to-br from-blue-50 to-teal-50 py-20 px-4">
+      <section className="flex flex-col items-center justify-center text-center  py-20 px-4">
         <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
           Find or Offer Skills in Your Neighbourhood
         </h1>
