@@ -1,46 +1,51 @@
-import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { getToken } from "../utils/auth";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../api/api';
 
 function PostService() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    description: "",
-    location: "",
+    title: '',
+    category: '',
+    description: '',
+    location: '',
+    price: '',
   });
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage('');
 
     try {
-      const token = getToken();
-      const res = await axios.post(
-        "http://localhost:5000/api/services",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      setMessage("Service posted successfully!");
-      setFormData({ title: "", category: "", description: "", location: "" });
+      const dataToSend = {
+        ...formData,
+        price: parseFloat(formData.price),
+      };
 
-      // Optionally redirect to home or dashboard after success
-      setTimeout(() => navigate("/"), 1500);
+      await api.post('/services', dataToSend);
+
+      setMessage('Service posted successfully!');
+      setFormData({
+        title: '',
+        category: '',
+        description: '',
+        location: '',
+        price: '',
+      });
+
+      setTimeout(() => navigate('/'), 1500);
     } catch (err) {
-      console.error(err);
-      setMessage(
-        err.response?.data?.message || "Error posting service. Please try again."
-      );
+      setMessage(err.response?.data?.message || 'Error posting service. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -54,9 +59,9 @@ function PostService() {
         {message && (
           <p
             className={`text-center mb-4 ${
-              message.includes("success")
-                ? "text-green-600"
-                : "text-red-500"
+              message.includes('success')
+                ? 'text-green-600'
+                : 'text-red-500'
             }`}
           >
             {message}
@@ -104,16 +109,27 @@ function PostService() {
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
           />
 
+          <input
+            type="number"
+            name="price"
+            placeholder="Price (in your currency)"
+            value={formData.price}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          />
+
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={loading}
           >
-            Submit Service
+            {loading ? 'Submitting...' : 'Submit Service'}
           </button>
         </form>
       </div>
     </div>
   );
-};
+}
 
 export default PostService;

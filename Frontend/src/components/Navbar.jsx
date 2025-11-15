@@ -1,25 +1,44 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { isAuthenticated, getUser, logout } from "../utils/auth";
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { isAuthenticated, getUser, logout } from '../utils/auth';
 
 function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setProfileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const user = getUser();
+  const profileMenuRef = useRef(null);
 
-  const handlePostClick = () => {
+  const handlePostServiceClick = () => {
     if (isAuthenticated()) {
-      navigate("/post-service");
+      navigate('/post-service');
     } else {
-      navigate("/login");
+      navigate('/login');
     }
+    setMobileMenuOpen(false);
   };
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate('/');
+    setProfileMenuOpen(false);
+    setMobileMenuOpen(false);
   };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const authenticated = isAuthenticated();
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -31,17 +50,16 @@ function Navbar() {
 
           <div className="hidden md:flex space-x-6 items-center">
             <Link to="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600">About</Link>
-            <Link to="/how-it-works" className="text-gray-700 hover:text-blue-600">How It Works</Link>
-
+            <Link to="/services" className="text-gray-700 hover:text-blue-600">Services</Link>
+            
             <button
-              onClick={handlePostClick}
+              onClick={handlePostServiceClick}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Post a Service
             </button>
 
-            {!isAuthenticated() && (
+            {!authenticated && (
               <>
                 <Link to="/login" className="text-gray-700 hover:text-blue-600">
                   Login
@@ -55,13 +73,13 @@ function Navbar() {
               </>
             )}
 
-            {isAuthenticated() && (
-              <div className="relative">
+            {authenticated && (
+              <div className="relative" ref={profileMenuRef}>
                 <button
-                  onClick={() => setProfileOpen(!profileOpen)}
+                  onClick={() => setProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-full hover:bg-gray-200"
                 >
-                  <span className="text-gray-700">{user?.name?.split(" ")[0]}</span>
+                  <span className="text-gray-700">{user?.name?.split(' ')[0]}</span>
                   <img
                     src={`https://ui-avatars.com/api/?name=${user?.name}&background=1D4ED8&color=fff`}
                     alt="avatar"
@@ -69,24 +87,15 @@ function Navbar() {
                   />
                 </button>
 
-                {profileOpen && (
+                {isProfileMenuOpen && (
                   <div className="absolute right-0 mt-2 w-40 bg-white shadow-md border rounded-lg py-2">
                     <Link
                       to="/profile"
                       className="block px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setProfileOpen(false)}
+                      onClick={() => setProfileMenuOpen(false)}
                     >
                       Profile
                     </Link>
-
-                    <Link
-                      to="/my-services"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setProfileOpen(false)}
-                    >
-                      My Services
-                    </Link>
-
                     <button
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
@@ -100,90 +109,60 @@ function Navbar() {
           </div>
 
           <button
-            onClick={() => setIsOpen(!isOpen)}
+            onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden text-gray-700 hover:text-blue-600"
           >
-            {isOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
+            {isMobileMenuOpen ? 'Close' : 'Menu'}
           </button>
         </div>
       </div>
 
-      {isOpen && (
+      {isMobileMenuOpen && (
         <div className="md:hidden bg-white shadow-lg">
           <div className="px-4 py-3 space-y-2">
-            <Link to="/" className="block text-gray-700" onClick={() => setIsOpen(false)}>
+            <Link to="/" className="block text-gray-700" onClick={() => setMobileMenuOpen(false)}>
               Home
             </Link>
-
-            <Link to="/about" className="block text-gray-700" onClick={() => setIsOpen(false)}>
-              About
+            <Link to="/services" className="block text-gray-700" onClick={() => setMobileMenuOpen(false)}>
+              Services
             </Link>
-
-            <Link to="/how-it-works" className="block text-gray-700" onClick={() => setIsOpen(false)}>
-              How It Works
-            </Link>
-
             <button
-              onClick={() => {
-                handlePostClick();
-                setIsOpen(false);
-              }}
+              onClick={handlePostServiceClick}
               className="block w-full px-4 py-2 bg-blue-600 text-white rounded-lg"
             >
               Post a Service
             </button>
 
-            {!isAuthenticated() && (
+            {!authenticated && (
               <>
                 <Link
                   to="/login"
                   className="block text-gray-700"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Login
                 </Link>
-
                 <Link
                   to="/register"
                   className="block px-4 py-2 bg-blue-600 text-white rounded-lg text-center"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Register
                 </Link>
               </>
             )}
 
-            {isAuthenticated() && (
+            {authenticated && (
               <>
                 <Link
                   to="/profile"
                   className="block px-2 py-2 hover:bg-gray-100"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   Profile
                 </Link>
-
-                <Link
-                  to="/my-services"
-                  className="block px-2 py-2 hover:bg-gray-100"
-                  onClick={() => setIsOpen(false)}
-                >
-                  My Services
-                </Link>
-
                 <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
+                  onClick={handleLogout}
                   className="block w-full text-left px-2 py-2 text-red-600 hover:bg-gray-100"
                 >
                   Logout

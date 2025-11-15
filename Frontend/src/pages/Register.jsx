@@ -1,77 +1,97 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
-import { setToken } from "../utils/auth";
+import { setToken, setUser } from "../utils/auth";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/register", form);
-      setToken(res.data.token);
-      navigate("/");
+      const response = await api.post('/auth/register', formData);
+      setToken(response.data.token);
+      setUser(response.data.user);
+      navigate('/');
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
-        <h2 className="text-2xl font-bold text-center text-blue-600 mb-6">Create Account</h2>
-        {error && <p className="text-red-500 text-center mb-3">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+      <div className="bg-white shadow-md rounded-xl p-6 w-full max-w-md">
+        <h2 className="text-2xl font-bold text-center text-blue-600">Register</h2>
+
+        {error && <p className="text-red-600 text-sm mt-2 text-center">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <input
-            name="name"
             type="text"
+            name="name"
             placeholder="Full Name"
-            value={form.name}
+            className="w-full border px-4 py-2 rounded-lg"
+            value={formData.name}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
           />
+
           <input
-            name="email"
             type="email"
+            name="email"
             placeholder="Email"
-            value={form.email}
+            className="w-full border px-4 py-2 rounded-lg"
+            value={formData.email}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
           />
+
           <input
-            name="password"
             type="password"
+            name="password"
             placeholder="Password"
-            value={form.password}
+            className="w-full border px-4 py-2 rounded-lg"
+            value={formData.password}
             onChange={handleChange}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
           />
+
           <button
             type="submit"
-            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+            disabled={loading}
           >
-            Register
+            {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
-        <p className="text-center text-sm mt-4 text-gray-600">
-          Already have an account?{" "}
-          <Link to="/login" className="text-blue-600 hover:underline">
+
+        <p className="text-center text-sm mt-4">
+          Already have an account?{' '}
+          <Link to="/login" className="text-blue-600 cursor-pointer hover:underline">
             Login
           </Link>
         </p>
       </div>
     </div>
   );
-};
+}
 
 export default Register;
