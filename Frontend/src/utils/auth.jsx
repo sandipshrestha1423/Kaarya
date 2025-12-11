@@ -3,7 +3,31 @@ export const isAuthenticated = () => {
 };
 
 export const getUser = () => {
-  return JSON.parse(localStorage.getItem("user"));
+  const user = localStorage.getItem("user");
+  if (!user) {
+    return null;
+  }
+  try {
+    return JSON.parse(user);
+  } catch (error) {
+    return null;
+  }
+};
+
+export const getToken = () => {
+  return localStorage.getItem("token");
+};
+
+export const setToken = (token) => {
+  localStorage.setItem("token", token);
+};
+
+export const setUser = (user) => {
+  if (user) {
+    localStorage.setItem("user", JSON.stringify(user));
+  } else {
+    localStorage.removeItem("user");
+  }
 };
 
 export const logout = () => {

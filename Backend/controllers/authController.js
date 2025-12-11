@@ -68,10 +68,13 @@ async function login(req, res) {
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
-      { expiresIn: 3600 },
+      { expiresIn: '7d' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({
+          token,
+          user: { id: user.id, name: user.name, email: user.email },
+        });
       }
     );
   } catch (err) {
