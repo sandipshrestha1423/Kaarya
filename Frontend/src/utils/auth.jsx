@@ -1,7 +1,3 @@
-export const setToken = (token) => {
-  localStorage.setItem("token", token);
-};
-
 export const getUser = () => {
   const user = localStorage.getItem("user");
   if (!user) {
@@ -14,10 +10,6 @@ export const getUser = () => {
   }
 };
 
-export const getToken = () => {
-  return localStorage.getItem("token");
-};
-
 export const setUser = (user) => {
   if (user) {
     localStorage.setItem("user", JSON.stringify(user));
@@ -26,10 +18,10 @@ export const setUser = (user) => {
   }
 };
 
-export const removeToken = () => {
-  localStorage.removeItem("token");
+export const logout = () => {
+  setUser(null);
 };
 
 export const isAuthenticated = () => {
-  return !!getToken();
+  return !!getUser();
 };

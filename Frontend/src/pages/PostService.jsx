@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { getToken } from "../utils/auth";
+import api from "../api/api";
 
 function PostService() {
   const navigate = useNavigate();
@@ -21,16 +20,7 @@ function PostService() {
     e.preventDefault();
 
     try {
-      const token = getToken();
-      const res = await axios.post(
-        "http://localhost:5000/api/services",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/services", formData);
       setMessage("Service posted successfully!");
       setFormData({ title: "", category: "", description: "", location: "" });
 

@@ -1,17 +1,28 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { isAuthenticated } from "../utils/auth";
+import ProfileMenu from "./ProfileMenu";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAuth, setIsAuth] = useState(isAuthenticated());
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsAuth(isAuthenticated());
+  }, [location.pathname]);
 
   const handlePostClick = () => {
-    if (isAuthenticated()) {
+    if (isAuth) {
       navigate("/post-service");
     } else {
       navigate("/login");
     }
+  };
+
+  const closeMobileMenu = () => {
+    setIsOpen(false);
   };
 
   return (
@@ -28,10 +39,16 @@ function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-6 items-center">
-            <Link to="/" className="text-gray-700 hover:text-blue-600 transition">
+            <Link
+              to="/"
+              className="text-gray-700 hover:text-blue-600 transition"
+            >
               Home
             </Link>
-            <Link to="/about" className="text-gray-700 hover:text-blue-600 transition">
+            <Link
+              to="/about"
+              className="text-gray-700 hover:text-blue-600 transition"
+            >
               About
             </Link>
             <Link
@@ -41,7 +58,6 @@ function Navbar() {
               How It Works
             </Link>
 
-            {/* Post a Service button */}
             <button
               onClick={handlePostClick}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -49,20 +65,29 @@ function Navbar() {
               Post a Service
             </button>
 
-            {/* Auth links */}
-            <Link to="/login" className="text-gray-700 hover:text-blue-600 transition">
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              Register
-            </Link>
+            {isAuth ? (
+              <ProfileMenu />
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-gray-700 hover:text-blue-600 transition"
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                >
+                  Register
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center space-x-4">
+            {isAuth && <ProfileMenu />}
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
@@ -103,55 +128,69 @@ function Navbar() {
             <Link
               to="/"
               className="block text-gray-700 hover:text-blue-600"
-              onClick={() => setIsOpen(false)}
+              onClick={closeMobileMenu}
             >
               Home
             </Link>
             <Link
               to="/about"
               className="block text-gray-700 hover:text-blue-600"
-              onClick={() => setIsOpen(false)}
+              onClick={closeMobileMenu}
             >
               About
             </Link>
             <Link
               to="/how-it-works"
               className="block text-gray-700 hover:text-blue-600"
-              onClick={() => setIsOpen(false)}
+              onClick={closeMobileMenu}
             >
               How It Works
             </Link>
 
-            {/* Post a Service for mobile */}
             <button
               onClick={() => {
                 handlePostClick();
-                setIsOpen(false);
+                closeMobileMenu();
               }}
               className="block w-full text-left px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Post a Service
             </button>
 
-            <Link
-              to="/login"
-              className="block text-gray-700 hover:text-blue-600"
-              onClick={() => setIsOpen(false)}
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center"
-              onClick={() => setIsOpen(false)}
-            >
-              Register
-            </Link>
+            {!isAuth ? (
+              <>
+                <Link
+                  to="/login"
+                  className="block text-gray-700 hover:text-blue-600"
+                  onClick={closeMobileMenu}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center"
+                  onClick={closeMobileMenu}
+                >
+                  Register
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/profile"
+                  className="block text-gray-700 hover:text-blue-600"
+                  onClick={closeMobileMenu}
+                >
+                  My Profile
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
     </nav>
   );
-};
+
+}
 
 export default Navbar;

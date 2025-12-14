@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { getToken } from '../utils/auth';
 
 const API_URL = 'http://localhost:5000/api';
 
@@ -8,14 +7,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-});
-
-api.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  withCredentials: true, // Important for sending session cookies
 });
 
 export default api;
