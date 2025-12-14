@@ -1,12 +1,6 @@
-export const setToken = (token) => {
-  localStorage.setItem("token", token);
-};
-
 export const getUser = () => {
   const user = localStorage.getItem("user");
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
   try {
     return JSON.parse(user);
   } catch (error) {
@@ -14,9 +8,7 @@ export const getUser = () => {
   }
 };
 
-export const getToken = () => {
-  return localStorage.getItem("token");
-};
+export const getToken = () => localStorage.getItem("token");
 
 export const setToken = (token) => {
   localStorage.setItem("token", token);
