@@ -20,11 +20,14 @@ async function register(req, res) {
     await user.save();
 
     req.session.userId = user.id;
-    req.session.user = { id: user.id, name: user.name, email: user.email };
+    const userPayload = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+    req.session.user = userPayload;
 
-    res
-      .status(201)
-      .json({ user: { id: user.id, name: user.name, email: user.email } });
+    res.status(201).json({ user: userPayload });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
@@ -50,26 +53,39 @@ async function login(req, res) {
     }
 
     req.session.userId = user.id;
-    req.session.user = { id: user.id, name: user.name, email: user.email };
+    const userPayload = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    };
+    req.session.user = userPayload;
 
-    res
-      .status(200)
-      .json({ user: { id: user.id, name: user.name, email: user.email } });
+    res.status(200).json({ user: userPayload });
   } catch (err) {
     console.error(err.message);
     res.status(500).send("Server error");
   }
 }
 
-exports.login = login;
-
 async function logout(req, res) {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).send("Could not log out, please try again.");
-    }
-    res.clearCookie("connect.sid"); // Clears the session cookie
-    return res.status(200).json({ msg: "Logged out successfully" });
-  });
+  if (req.session) {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error("Session destruction error:", err); // Log the error
+        return res.status(500).send("Could not log out, please try again.");
+      }
+      res.clearCookie("connect.sid"); // Clears the session cookie
+      return res.status(200).json({ msg: "Logged out successfully" });
+    });
+  } else {
+    // If no session exists, just clear any potential session cookie
+    res.clearCookie("connect.sid");
+    return res.status(200).json({ msg: "Already logged out or no active session." });
+  }
 }
-exports.logout = logout;
+
+module.exports = {
+  register,
+  login,
+  logout,
+};

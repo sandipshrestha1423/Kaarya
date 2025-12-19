@@ -10,6 +10,7 @@ import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Profile from "./pages/Profile";
 import MyServices from "./pages/MyServices";
+import AdminLogin from "./pages/AdminLogin";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/how-it-works" element={<HowItWorks />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
         <Route path="/register" element={<Register />} />
         <Route
           path="/post-service"
@@ -51,4 +53,3 @@ function App() {
 }
 
 export default App;
-
