@@ -1,22 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { setUser } from "../utils/auth";
+import { useAuth } from "../context/AuthContext";
 import api from "../api/api";
+import LocationPicker from "../components/LocationPicker";
 
 function Register() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "", role: "seeker" });
+  const [location, setLocation] = useState(null);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); // Use context
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+  
+  const handleLocationSelect = (loc) => {
+      setLocation(loc);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post("/auth/register", form);
-      setUser(res.data.user);
+      // Include location in the payload
+      const payload = { ...form, location };
+      const res = await api.post("/auth/register", payload);
+      login(res.data.user); // Log user in immediately via context
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
@@ -25,10 +34,10 @@ function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300">
-      <div className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse transition-colors duration-300">
+      <div className="max-w-6xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse transition-colors duration-300">
         
         {/* Right Side - Visual (Reversed for Register) */}
-        <div className="md:w-1/2 bg-gradient-to-br from-purple-600 to-pink-600 p-10 text-white flex flex-col justify-center relative overflow-hidden">
+        <div className="md:w-5/12 bg-linear-to-br from-purple-600 to-pink-600 p-10 text-white flex flex-col justify-center relative overflow-hidden">
           <div className="absolute top-0 right-0 w-full h-full bg-white opacity-10 transform skew-x-12"></div>
           <div className="relative z-10">
             <h2 className="text-4xl font-extrabold mb-4">Join Us!</h2>
@@ -43,7 +52,7 @@ function Register() {
         </div>
 
         {/* Left Side - Form */}
-        <div className="md:w-1/2 p-8 md:p-12">
+        <div className="md:w-7/12 p-8 md:p-12 overflow-y-auto max-h-screen">
           <div className="text-center md:text-left mb-8">
             <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Create an Account</h3>
             <p className="text-gray-500 dark:text-gray-400 mt-2">Sign up to get started.</p>
@@ -56,30 +65,32 @@ function Register() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
-              <input
-                name="name"
-                type="text"
-                placeholder="John Doe"
-                value={form.name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
-              />
-            </div>
+            <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                  <input
+                    name="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                  />
+                </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
-              <input
-                name="email"
-                type="email"
-                placeholder="you@example.com"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
-              />
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                  />
+                </div>
             </div>
             
             <div>
@@ -93,6 +104,15 @@ function Register() {
                 required
                 className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
               />
+            </div>
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Your Location <span className="text-xs text-gray-500 font-normal">(Click on map to select)</span>
+                </label>
+                <div className="h-64 rounded-xl overflow-hidden z-0">
+                    <LocationPicker onLocationSelect={handleLocationSelect} />
+                </div>
             </div>
 
             <button

@@ -8,13 +8,21 @@ function PostService() {
     title: "",
     category: "",
     description: "",
-    location: "",
+    type: "request",
+    fee: "",
+    feeUnit: "Hour",
+    preferredTime: "",
+    preferredDay: ""
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+  
+  const handleTypeChange = (type) => {
+      setFormData({ ...formData, type });
   };
 
   const handleSubmit = async (e) => {
@@ -25,7 +33,10 @@ function PostService() {
     try {
       await api.post("/services", formData);
       setMessage("Service posted successfully!");
-      setFormData({ title: "", category: "", description: "", location: "" });
+      setFormData({ 
+          title: "", category: "", description: "", type: "request",
+          fee: "", feeUnit: "Hour", preferredTime: "", preferredDay: ""
+      });
       setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       console.error(err);
@@ -39,10 +50,10 @@ function PostService() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-2xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden transition-colors duration-300">
+      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden transition-colors duration-300">
         <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
           <h2 className="text-3xl font-bold text-white">Post a New Service</h2>
-          <p className="text-indigo-100 mt-2">Share your skills or request help from your neighbors.</p>
+          <p className="text-indigo-100 mt-2">Share your skills or request help. Your registered location will be used.</p>
         </div>
 
         <div className="p-8">
@@ -50,61 +61,129 @@ function PostService() {
             <div className={`p-4 rounded-xl mb-6 flex items-center ${
               message.includes("success") ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300" : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300"
             }`}>
-              {message.includes("success") ? (
-                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
-              ) : (
-                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              )}
-              {message}
+              {message.includes("success") ? "✓" : "⚠️"} {message}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            
+            {/* Type Slider */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Service Title</label>
-              <input
-                type="text"
-                name="title"
-                placeholder="e.g. Plumbing Help Needed"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
-              />
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">I am looking to...</label>
+                <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl relative h-12">
+                    <div 
+                        className={`w-1/2 h-full absolute top-0 left-0 bg-indigo-600 rounded-xl transition-all duration-300 transform ${formData.type === 'offer' ? 'translate-x-full' : 'translate-x-0'}`}
+                    ></div>
+                    <button
+                        type="button"
+                        onClick={() => handleTypeChange('request')}
+                        className={`flex-1 text-center text-sm font-bold z-10 transition-colors duration-300 flex items-center justify-center gap-2 ${formData.type === 'request' ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}
+                    >
+                        <span>🔍</span> Find Help
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => handleTypeChange('offer')}
+                        className={`flex-1 text-center text-sm font-bold z-10 transition-colors duration-300 flex items-center justify-center gap-2 ${formData.type === 'offer' ? 'text-white' : 'text-gray-600 dark:text-gray-300'}`}
+                    >
+                         <span>💼</span> Offer Skill
+                    </button>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Category</label>
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
-                >
-                  <option value="" disabled>Select a category</option>
-                  <option value="Repairs">Repairs</option>
-                  <option value="Tutoring">Tutoring</option>
-                  <option value="Delivery">Delivery</option>
-                  <option value="Cleaning">Cleaning</option>
-                  <option value="Tech Support">Tech Support</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Service Title</label>
+                  <input
+                    type="text"
+                    name="title"
+                    placeholder={formData.type === 'request' ? "e.g. Plumbing Help Needed" : "e.g. Expert Plumbing Services"}
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                  <select
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                  >
+                    <option value="" disabled>Select a category</option>
+                    <option value="Repairs">Repairs</option>
+                    <option value="Tutoring">Tutoring</option>
+                    <option value="Delivery">Delivery</option>
+                    <option value="Cleaning">Cleaning</option>
+                    <option value="Tech Support">Tech Support</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  placeholder="e.g. Downtown, Sector 4"
-                  value={formData.location}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
-                />
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex space-x-2">
+                    <div className="w-2/3">
+                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Fee Amount</label>
+                        <input
+                            type="number"
+                            name="fee"
+                            placeholder="e.g. 500"
+                            value={formData.fee}
+                            onChange={handleChange}
+                            required
+                            min="0"
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                        />
+                    </div>
+                    <div className="w-1/3">
+                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Unit</label>
+                        <select
+                            name="feeUnit"
+                            value={formData.feeUnit}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                        >
+                            <option value="Hour">Per Hour</option>
+                            <option value="Day">Per Day</option>
+                            <option value="Job">Fixed/Job</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                   {/* Placeholder for spacing or additional field if needed */}
+                </div>
+            </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Preferred Time</label>
+                  <input
+                    type="text"
+                    name="preferredTime"
+                    placeholder="e.g. Morning 9AM - 11AM"
+                    value={formData.preferredTime}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Preferred Day</label>
+                  <input
+                    type="text"
+                    name="preferredDay"
+                    placeholder="e.g. Weekends, Mondays"
+                    value={formData.preferredDay}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                  />
+                </div>
             </div>
 
             <div>

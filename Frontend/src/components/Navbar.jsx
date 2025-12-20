@@ -1,35 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { isAuthenticated } from "../utils/auth";
 import ProfileMenu from "./ProfileMenu";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAuth, setIsAuth] = useState(isAuthenticated());
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-
-  useEffect(() => {
-    setIsAuth(isAuthenticated());
-  }, [location.pathname]);
+  const { user } = useAuth(); // Use global auth state
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
+      setScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handlePostClick = () => {
-    if (isAuth) {
+    if (user) {
       navigate("/post-service");
     } else {
       navigate("/login");
@@ -40,27 +32,30 @@ function Navbar() {
     setIsOpen(false);
   };
 
-  const navClass = `fixed w-full z-50 transition-all duration-300 ${
-    scrolled
-      ? "bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md py-2"
-      : "bg-transparent py-4"
-  }`;
+  // Simplified logic for classes
+  // If scrolled: white background (light) or gray-900 (dark)
+  // If not scrolled: transparent (depends on page background)
+  const navBgClass = scrolled 
+    ? "bg-white/90 dark:bg-gray-900/90 shadow-md backdrop-blur-sm" 
+    : "bg-transparent";
 
+  // Text colors: Always ensure contrast. 
+  // Dark mode text is always light gray/white. Light mode text is dark gray.
   const linkClass = (path) =>
     `text-sm font-medium transition-colors duration-200 ${
       location.pathname === path
         ? "text-indigo-600 dark:text-indigo-400"
-        : "text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400"
+        : "text-gray-700 hover:text-indigo-600 dark:text-gray-200 dark:hover:text-indigo-400"
     }`;
 
   return (
-    <nav className={navClass}>
+    <nav className={`fixed w-full z-50 transition-all duration-300 py-4 ${navBgClass}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link
+            <Link
             to="/"
-            className="text-2xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 hover:opacity-80 transition"
+            className="text-2xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 hover:opacity-80 transition"
           >
             Kaarya
           </Link>
@@ -80,30 +75,26 @@ function Navbar() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              className="p-2 rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
               aria-label="Toggle Dark Mode"
             >
-              {theme === "dark" ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-              )}
+              {theme === "dark" ? "☀️" : "🌙"}
             </button>
 
             <button
               onClick={handlePostClick}
-              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              className="px-5 py-2.5 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
             >
               Post a Service
             </button>
 
-            {isAuth ? (
+            {user ? (
               <ProfileMenu />
             ) : (
               <div className="flex items-center space-x-4">
                 <Link
                   to="/login"
-                  className="text-gray-600 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition"
+                  className="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium transition"
                 >
                   Login
                 </Link>
@@ -122,42 +113,22 @@ function Navbar() {
              {/* Mobile Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full text-gray-600 dark:text-gray-300 focus:outline-none"
+              className="p-2 rounded-full text-gray-700 dark:text-gray-200 focus:outline-none"
             >
-               {theme === "dark" ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-              )}
+               {theme === "dark" ? "☀️" : "🌙"}
             </button>
 
-            {isAuth && <ProfileMenu />}
+            {user && <ProfileMenu />}
             <button
               onClick={() => setIsOpen(!isOpen)}
               type="button"
-              className="text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none"
+              className="text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 focus:outline-none"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
@@ -171,21 +142,21 @@ function Navbar() {
           <div className="px-4 py-4 space-y-3">
             <Link
               to="/"
-              className="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
+              className="block text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
               onClick={closeMobileMenu}
             >
               Home
             </Link>
             <Link
               to="/about"
-              className="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
+              className="block text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
               onClick={closeMobileMenu}
             >
               About
             </Link>
             <Link
               to="/how-it-works"
-              className="block text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
+              className="block text-gray-700 dark:text-gray-200 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium"
               onClick={closeMobileMenu}
             >
               How It Works
@@ -196,16 +167,16 @@ function Navbar() {
                 handlePostClick();
                 closeMobileMenu();
               }}
-              className="block w-full text-center px-4 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium shadow-md"
+              className="block w-full text-center px-4 py-3 bg-linear-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium shadow-md"
             >
               Post a Service
             </button>
 
-            {!isAuth ? (
+            {!user ? (
               <div className="grid grid-cols-2 gap-4 mt-4">
                 <Link
                   to="/login"
-                  className="block text-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                  className="block text-center px-4 py-2 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                   onClick={closeMobileMenu}
                 >
                   Login

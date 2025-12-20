@@ -1,22 +1,34 @@
 const Service = require("../models/Service");
+const User = require("../models/User");
 
 exports.createService = async (req, res) => {
-  const { title, category, description, location } = req.body;
+  const { title, category, description, type, fee, feeUnit, preferredTime, preferredDay } = req.body;
 
   try {
-    console.log("Request Body:", req.body);
-    console.log("User ID:", req.user.id);
+    // Fetch user to get their registered location
+    const user = await User.findById(req.user.id);
+    if (!user) {
+        return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Use user's registered address/location string for the service
+    // Assuming user.location.address is the string representation
+    const userLocationStr = user.location ? user.location.address : "Location not available";
 
     const service = new Service({
       title,
       category,
       description,
-      location,
+      location: userLocationStr, // Auto-populate location
+      type: type || 'request',
+      fee,
+      feeUnit,
+      preferredTime,
+      preferredDay,
       user: req.user.id,
     });
 
     const savedService = await service.save();
-    console.log("Service saved successfully:", savedService);
     res.status(201).json(savedService);
   } catch (err) {
     console.error("Error saving service:", err);
@@ -38,7 +50,7 @@ exports.getServiceById = async (req, res) => {
   try {
     const service = await Service.findById(req.params.id).populate(
       "user",
-      "name email"
+      "name email mobile"
     );
     if (!service) {
       return res.status(404).json({ msg: "Service not found" });
@@ -55,7 +67,7 @@ exports.getServiceById = async (req, res) => {
 
 exports.updateService = async (req, res) => {
   try {
-    const { title, description, category, location, price } = req.body;
+    const { title, description, category, location, fee, feeUnit, preferredTime, preferredDay } = req.body;
     let service = await Service.findById(req.params.id);
 
     if (!service) {
@@ -69,7 +81,7 @@ exports.updateService = async (req, res) => {
 
     service = await Service.findByIdAndUpdate(
       req.params.id,
-      { $set: { title, description, category, location, price } },
+      { $set: { title, description, category, location, fee, feeUnit, preferredTime, preferredDay } },
       { new: true }
     );
 
@@ -93,7 +105,7 @@ exports.deleteService = async (req, res) => {
       return res.status(401).json({ msg: "User not authorized" });
     }
 
-    await service.remove();
+    await service.deleteOne(); // updated from remove() to deleteOne() for newer mongoose versions
 
     res.json({ msg: "Service removed" });
   } catch (err) {

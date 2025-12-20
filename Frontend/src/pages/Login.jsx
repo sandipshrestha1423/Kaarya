@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { setUser } from "../utils/auth";
+import { useAuth } from "../context/AuthContext";
 import api from "../api/api";
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login } = useAuth(); // Get login function from context
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -16,7 +17,7 @@ function Login() {
     e.preventDefault();
     try {
       const res = await api.post("/auth/login", form);
-      setUser(res.data.user);
+      login(res.data.user); // Update context state
       navigate("/"); 
     } catch (err) {
       setError(err.response?.data?.message || "Invalid credentials");

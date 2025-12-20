@@ -15,6 +15,31 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  role: {
+    type: String,
+    enum: ['seeker', 'provider', 'both'],
+    default: 'seeker'
+  },
+  mobile: {
+    type: String,
+  },
+  profileImage: {
+    type: String,
+  },
+  location: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      index: '2dsphere',
+    },
+    address: {
+      type: String,
+    },
+  },
 });
 
 UserSchema.pre('save', async function preSaveHook(next) {

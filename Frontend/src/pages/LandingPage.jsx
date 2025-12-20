@@ -1,17 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api/api"; // Import the API instance
+import { useAuth } from "../context/AuthContext";
 
 function LandingPage() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const handleServiceClick = (service) => {
+      // If current user is the owner of the service, go to profile
+      if (user && service.user && user.id === service.user._id) {
+          navigate('/profile');
+      } else {
+          // Else go to service details
+          navigate(`/service/${service._id}`);
+      }
+  };
 
   useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await api.get("/services");
-        setServices(response.data);
+        // Filter out services where user is null (deleted users)
+        const validServices = response.data.filter(service => service.user);
+        setServices(validServices);
       } catch (err) {
         console.error("Error fetching services:", err);
         setError("Failed to load services. Please try again later.");
@@ -26,8 +41,8 @@ function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 -z-10 transition-colors duration-300"></div>
+      <section className="relative py-20 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 -z-10 transition-colors duration-300"></div>
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-200 dark:bg-purple-900 rounded-full blur-3xl opacity-30"></div>
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-indigo-200 dark:bg-indigo-900 rounded-full blur-3xl opacity-30"></div>
 
@@ -36,7 +51,7 @@ function LandingPage() {
             🚀 Connect with your community
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6 transition-colors duration-300">
-            Find Help. <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">Offer Skills.</span>
+            Find Help. <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">Offer Skills.</span>
             <br /> All Nearby.
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed transition-colors duration-300">
@@ -45,7 +60,7 @@ function LandingPage() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
               to="/login"
-              className="px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-bold rounded-full shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+              className="px-8 py-4 bg-linear-to-r from-indigo-600 to-purple-600 text-white text-lg font-bold rounded-full shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
             >
               Explore Services
             </Link>
@@ -116,7 +131,8 @@ function LandingPage() {
             {services.map((service) => (
               <div
                 key={service._id}
-                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full"
+                onClick={() => handleServiceClick(service)}
+                className="group bg-white dark:bg-gray-800 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 overflow-hidden flex flex-col h-full cursor-pointer"
               >
                 <div className="p-6 flex-1">
                   <div className="flex justify-between items-start mb-4">
@@ -137,11 +153,11 @@ function LandingPage() {
                 
                 <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-100 dark:border-gray-600 flex items-center justify-between transition-colors duration-300">
                   <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-500 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-200">
-                      {service.user.name.charAt(0).toUpperCase()}
+                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-gray-200 to-gray-300 dark:from-gray-600 dark:to-gray-500 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-200">
+                      {service.user?.name?.charAt(0).toUpperCase() || "?"}
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-xs font-semibold text-gray-900 dark:text-gray-200">{service.user.name}</span>
+                      <span className="text-xs font-semibold text-gray-900 dark:text-gray-200">{service.user?.name || "Unknown User"}</span>
                       <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
                         <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         {service.location}
@@ -192,7 +208,7 @@ function LandingPage() {
                 key={i}
                 className="relative p-8 rounded-3xl bg-gray-50 dark:bg-gray-700 border border-gray-100 dark:border-gray-600 hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
               >
-                <div className={`absolute -top-6 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} shadow-lg flex items-center justify-center`}>
+                <div className={`absolute -top-6 left-1/2 transform -translate-x-1/2 w-16 h-16 rounded-2xl bg-linear-to-br ${step.color} shadow-lg flex items-center justify-center`}>
                   {step.icon}
                 </div>
                 <h3 className="mt-8 text-xl font-bold text-gray-900 dark:text-white mb-3">{step.title}</h3>

@@ -7,8 +7,8 @@ function HowItWorks() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex flex-col">
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 -z-10 transition-colors duration-300"></div>
+      <section className="relative py-20 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 -z-10 transition-colors duration-300"></div>
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-200 dark:bg-purple-900 rounded-full blur-3xl opacity-30"></div>
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-indigo-200 dark:bg-indigo-900 rounded-full blur-3xl opacity-30"></div>
 
@@ -18,7 +18,7 @@ function HowItWorks() {
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6 transition-colors duration-300">
             Simple. Fast. <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
               Hyper-Local.
             </span>
           </h1>
@@ -49,7 +49,7 @@ function HowItWorks() {
       </section>
 
       {/* Steps Section */}
-      <section className="py-20 px-4 flex-grow bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      <section className="py-20 px-4 grow bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
           <div className="max-w-5xl mx-auto">
               {activeTab === 'seeker' ? (
                   <div className="space-y-12">
@@ -59,7 +59,7 @@ function HowItWorks() {
                           { num: 3, title: "Get it Done", desc: "Agree on a time and price, get your task completed, and pay the provider.", icon: "✅" }
                       ].map((step) => (
                           <div key={step.num} className="flex flex-col md:flex-row items-center bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700">
-                              <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center text-3xl font-bold mb-6 md:mb-0 md:mr-8 flex-shrink-0">
+                              <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center text-3xl font-bold mb-6 md:mb-0 md:mr-8 shrink-0">
                                   {step.icon}
                               </div>
                               <div className="text-center md:text-left">
@@ -77,7 +77,7 @@ function HowItWorks() {
                           { num: 3, title: "Start Earning", desc: "Receive inquiries, complete tasks, and build your reputation.", icon: "💰" }
                       ].map((step) => (
                           <div key={step.num} className="flex flex-col md:flex-row items-center bg-white dark:bg-gray-800 rounded-3xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 dark:border-gray-700">
-                              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center text-3xl font-bold mb-6 md:mb-0 md:mr-8 flex-shrink-0">
+                              <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-2xl flex items-center justify-center text-3xl font-bold mb-6 md:mb-0 md:mr-8 shrink-0">
                                   {step.icon}
                               </div>
                               <div className="text-center md:text-left">
