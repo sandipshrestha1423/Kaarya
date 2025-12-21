@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/api"; 
 import LocationPicker from "../components/LocationPicker"; 
 
+import { useAuth } from "../context/AuthContext";
+
 function Register() {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [location, setLocation] = useState(null); 
@@ -10,6 +12,7 @@ function Register() {
   const [error, setError] = useState("");
   
   const navigate = useNavigate(); 
+  const { user, logout } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,6 +20,11 @@ function Register() {
   
   const handleLocationSelect = (loc) => {
       setLocation(loc); 
+  };
+  
+  const handleLogout = () => {
+    logout();
+    navigate("/register");
   };
 
   const handleSubmit = async (e) => {
@@ -40,6 +48,38 @@ function Register() {
       setMessage("");
     }
   };
+
+  if (user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 text-center border border-gray-100 dark:border-gray-700">
+          <div className="w-20 h-20 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-3xl">✨</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Account Active</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
+            You are currently logged in as <span className="font-semibold text-purple-600 dark:text-purple-400">{user.name}</span>.
+            <br />
+            To create a new account, please logout first.
+          </p>
+          <div className="space-y-3">
+             <button
+              onClick={() => navigate("/")}
+              className="w-full py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              Go to Home
+            </button>
+            <button
+              onClick={handleLogout}
+              className="w-full py-3 bg-purple-600 text-white font-bold rounded-xl shadow-lg hover:bg-purple-700 transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">

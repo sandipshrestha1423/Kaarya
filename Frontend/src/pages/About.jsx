@@ -26,7 +26,7 @@ function About() {
       </section>
 
       {/* Mission Section */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-800 transition-colors duration-300 flex-grow">
+      <section className="py-20 px-4 bg-white dark:bg-gray-800 transition-colors duration-300 grow">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12">
             <div className="md:w-1/2">
                 <div className="bg-gray-100 dark:bg-gray-700 p-2 rounded-2xl shadow-xl transform rotate-2">

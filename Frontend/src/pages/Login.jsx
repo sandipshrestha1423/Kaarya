@@ -7,10 +7,15 @@ function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate(); 
-  const { login } = useAuth(); 
+  const { login, user, logout } = useAuth(); 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   const handleSubmit = async (e) => {
@@ -25,6 +30,38 @@ function Login() {
       setError(err.response?.data?.msg || "Invalid email or password. Please try again.");
     }
   };
+
+  if (user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+        <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 text-center border border-gray-100 dark:border-gray-700">
+          <div className="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-3xl">👋</span>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Already Logged In</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-8">
+            You are currently logged in as <span className="font-semibold text-indigo-600 dark:text-indigo-400">{user.name}</span>.
+            <br />
+            Please logout first to access a different account.
+          </p>
+          <div className="space-y-3">
+             <button
+              onClick={() => navigate("/")}
+              className="w-full py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+            >
+              Go to Home
+            </button>
+            <button
+              onClick={handleLogout}
+              className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
