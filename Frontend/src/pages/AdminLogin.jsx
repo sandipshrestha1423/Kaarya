@@ -15,59 +15,58 @@ function AdminLogin() {
     e.preventDefault();
     try {
       const res = await api.post("/admin/login", form);
-      localStorage.setItem("admin", JSON.stringify(res.data.admin)); 
-      alert("Admin Login Successful");
-      navigate("/");
+      // Save admin info separately
+      localStorage.setItem("admin", JSON.stringify(res.data.admin));
+      navigate("/admin-dashboard"); 
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials");
+      setError(err.response?.data?.msg || "Invalid admin credentials");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 px-4">
-      <div className="w-full max-w-md bg-gray-800 border border-gray-700 shadow-2xl rounded-2xl p-8 md:p-10">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
+      <div className="max-w-md w-full bg-gray-800 rounded-3xl shadow-2xl p-8 border border-gray-700">
         <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white tracking-tight">Admin Portal</h2>
-            <p className="text-gray-400 text-sm mt-2">Restricted Access</p>
+          <h2 className="text-3xl font-extrabold text-white">Admin Panel</h2>
+          <p className="text-gray-400 mt-2">Restricted Access</p>
         </div>
 
         {error && (
-            <div className="bg-red-900/50 border border-red-800 text-red-200 text-sm p-3 rounded-lg mb-6 text-center">
-             {error}
-            </div>
+          <div className="bg-red-900/50 text-red-200 p-3 rounded-lg text-sm mb-6 text-center border border-red-800">
+            {error}
+          </div>
         )}
-        
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Email</label>
-              <input
-                name="email"
-                type="email"
-                placeholder="admin@kaarya.com"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-gray-900 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none placeholder-gray-600"
-              />
-          </div>
-          <div>
-              <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Password</label>
-              <input
-                name="password"
-                type="password"
-                placeholder="••••••••"
-                value={form.password}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 bg-gray-900 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none placeholder-gray-600"
-              />
+            <label className="block text-sm font-medium text-gray-400 mb-2">Email</label>
+            <input
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-white"
+            />
           </div>
           
+          <div>
+            <label className="block text-sm font-medium text-gray-400 mb-2">Password</label>
+            <input
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-white"
+            />
+          </div>
+
           <button
             type="submit"
-            className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 shadow-lg shadow-blue-900/30 transition-all duration-200"
+            className="w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all duration-200"
           >
-            Authenticate
+            Access Dashboard
           </button>
         </form>
       </div>

@@ -10,7 +10,7 @@ function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
-  const { user } = useAuth(); // Use global auth state
+  const { user } = useAuth(); 
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,15 +32,10 @@ function Navbar() {
     setIsOpen(false);
   };
 
-  // Simplified logic for classes
-  // If scrolled: white background (light) or gray-900 (dark)
-  // If not scrolled: transparent (depends on page background)
   const navBgClass = scrolled 
     ? "bg-white/90 dark:bg-gray-900/90 shadow-md backdrop-blur-sm" 
     : "bg-transparent";
 
-  // Text colors: Always ensure contrast. 
-  // Dark mode text is always light gray/white. Light mode text is dark gray.
   const linkClass = (path) =>
     `text-sm font-medium transition-colors duration-200 ${
       location.pathname === path
@@ -52,7 +47,7 @@ function Navbar() {
     <nav className={`fixed w-full z-50 transition-all duration-300 py-4 ${navBgClass}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          {/* Logo */}
+          
             <Link
             to="/"
             className="text-2xl font-extrabold bg-clip-text text-transparent bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 hover:opacity-80 transition"
@@ -60,7 +55,6 @@ function Navbar() {
             Kaarya
           </Link>
 
-          {/* Desktop Menu */}
           <div className="hidden md:flex space-x-8 items-center">
             <Link to="/" className={linkClass("/")}>
               Home
@@ -72,7 +66,6 @@ function Navbar() {
               How It Works
             </Link>
 
-            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
@@ -108,9 +101,8 @@ function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-4">
-             {/* Mobile Theme Toggle */}
+             
             <button
               onClick={toggleTheme}
               className="p-2 rounded-full text-gray-700 dark:text-gray-200 focus:outline-none"
@@ -136,7 +128,6 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
       {isOpen && (
         <div className="md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-lg absolute top-full left-0 w-full border-t border-gray-100 dark:border-gray-800">
           <div className="px-4 py-4 space-y-3">

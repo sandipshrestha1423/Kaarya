@@ -11,7 +11,7 @@ function ProfileMenu() {
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout");
-      logout(); // Update context
+      logout(); 
       navigate("/");
     } catch (err) {
       console.error("Logout failed", err);

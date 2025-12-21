@@ -5,7 +5,7 @@ function About() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 flex flex-col">
       {/* Hero Section */}
       <section className="relative py-20 lg:py-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 -z-10 transition-colors duration-300"></div>
+        <div className="absolute inset-0 bg-linear-to-br from-indigo-50 to-white dark:from-gray-900 dark:to-gray-800 -z-10 transition-colors duration-300"></div>
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-purple-200 dark:bg-purple-900 rounded-full blur-3xl opacity-30"></div>
         <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 bg-indigo-200 dark:bg-indigo-900 rounded-full blur-3xl opacity-30"></div>
 
@@ -15,7 +15,7 @@ function About() {
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-6 transition-colors duration-300">
             Empowering Communities, <br/> 
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
               One Connection at a Time.
             </span>
           </h1>

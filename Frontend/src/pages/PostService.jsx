@@ -41,7 +41,7 @@ function PostService() {
     } catch (err) {
       console.error(err);
       setMessage(
-        err.response?.data?.message || "Error posting service. Please try again."
+        err.response?.data?.msg || "Error posting service. Please try again."
       );
     } finally {
       setLoading(false);
@@ -49,9 +49,10 @@ function PostService() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden transition-colors duration-300">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden">
+        
+        <div className="bg-linear-to-r from-indigo-600 to-purple-600 px-8 py-6">
           <h2 className="text-3xl font-bold text-white">Post a New Service</h2>
           <p className="text-indigo-100 mt-2">Share your skills or request help. Your registered location will be used.</p>
         </div>
@@ -61,13 +62,13 @@ function PostService() {
             <div className={`p-4 rounded-xl mb-6 flex items-center ${
               message.includes("success") ? "bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300" : "bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300"
             }`}>
-              {message.includes("success") ? "✓" : "⚠️"} {message}
+              {message}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Type Slider */}
+            {/* Type Toggle Slider */}
             <div>
                 <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">I am looking to...</label>
                 <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-xl relative h-12">
@@ -101,7 +102,7 @@ function PostService() {
                     value={formData.title}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
                   />
                 </div>
                 <div>
@@ -111,7 +112,7 @@ function PostService() {
                     value={formData.category}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
                   >
                     <option value="" disabled>Select a category</option>
                     <option value="Repairs">Repairs</option>
@@ -136,7 +137,7 @@ function PostService() {
                             onChange={handleChange}
                             required
                             min="0"
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
                         />
                     </div>
                     <div className="w-1/3">
@@ -146,16 +147,13 @@ function PostService() {
                             value={formData.feeUnit}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                            className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
                         >
                             <option value="Hour">Per Hour</option>
                             <option value="Day">Per Day</option>
                             <option value="Job">Fixed/Job</option>
                         </select>
                     </div>
-                </div>
-                <div>
-                   {/* Placeholder for spacing or additional field if needed */}
                 </div>
             </div>
 
@@ -169,7 +167,7 @@ function PostService() {
                     value={formData.preferredTime}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
                   />
                 </div>
                 <div>
@@ -181,7 +179,7 @@ function PostService() {
                     value={formData.preferredDay}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
                   />
                 </div>
             </div>
@@ -195,7 +193,7 @@ function PostService() {
                 onChange={handleChange}
                 required
                 rows="5"
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none resize-none"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white resize-none"
               ></textarea>
             </div>
 
@@ -203,7 +201,7 @@ function PostService() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                className={`w-full py-4 bg-linear-to-r from-indigo-600 to-purple-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
                 {loading ? 'Posting Service...' : 'Publish Service'}
               </button>

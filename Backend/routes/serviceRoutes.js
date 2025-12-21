@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+
+// Import the logic (Controllers)
 const {
   getAllServices,
   getServiceById,
@@ -7,31 +9,25 @@ const {
   updateService,
   deleteService,
 } = require("../controllers/serviceController");
+
+// Import our Gatekeeper (Middleware)
 const auth = require("../middleware/auth");
 
-// @route   GET api/services
-// @desc    Get all services
-// @access  Public
+// --- ROUTES ---
+
+// 1. Get all services (Public - anyone can see this)
 router.get("/", getAllServices);
 
-// @route   GET api/services/:id
-// @desc    Get service by ID
-// @access  Public
+// 2. Get details for one specific service (Public)
 router.get("/:id", getServiceById);
 
-// @route   POST api/services
-// @desc    Create a service
-// @access  Private
+// 3. Create a new service (Private - must be logged in)
 router.post("/", auth, createService);
 
-// @route   PUT api/services/:id
-// @desc    Update a service
-// @access  Private
+// 4. Update a service (Private - must be logged in)
 router.put("/:id", auth, updateService);
 
-// @route   DELETE api/services/:id
-// @desc    Delete a service
-// @access  Private
+// 5. Delete a service (Private - must be logged in)
 router.delete("/:id", auth, deleteService);
 
 module.exports = router;

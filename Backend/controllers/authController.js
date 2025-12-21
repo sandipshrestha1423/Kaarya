@@ -2,65 +2,58 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 
 async function register(req, res) {
-  const { name, email, password, location, role } = req.body;
+  const { name, email, password, location } = req.body;
 
   try {
-    let user = await User.findOne({ email });
-
-    if (user) {
-      return res.status(400).json({ msg: "User already exists" });
+    let existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ msg: "User already exists." });
     }
 
-    // Construct the location object if provided
     let userLocation = undefined;
     if (location && location.lat && location.lng) {
         userLocation = {
             type: 'Point',
-            coordinates: [location.lng, location.lat], // GeoJSON expects [lng, lat]
+            coordinates: [location.lng, location.lat], 
             address: location.address || ''
         };
     }
 
-    user = new User({
+    const newUser = new User({
       name,
       email,
-      password,
-      role: role || 'seeker',
-      location: userLocation
+      password, 
+      roles: ['user'], // Default role
+      location: userLocation,
+      status: 'pending' 
     });
 
-    await user.save();
+    await newUser.save();
 
-    req.session.userId = user.id;
-    const userPayload = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    };
-    req.session.user = userPayload;
+    res.status(201).json({ 
+        msg: "Registration successful! Please wait for Admin approval to login." 
+    });
 
-    res.status(201).json({ user: userPayload });
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).send("Server Error");
   }
 }
-
-exports.register = register;
 
 async function login(req, res) {
   const { email, password } = req.body;
 
   try {
     let user = await User.findOne({ email });
-
     if (!user) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    if (user.status !== 'active') {
+        return res.status(403).json({ msg: "Your account is pending approval or has been rejected." });
+    }
 
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ msg: "Invalid credentials" });
     }
@@ -70,52 +63,46 @@ async function login(req, res) {
       id: user.id,
       name: user.name,
       email: user.email,
+      roles: user.roles, // Sending array of roles
+      profileImage: user.profileImage
     };
     req.session.user = userPayload;
 
     res.status(200).json({ user: userPayload });
+
   } catch (err) {
     console.error(err.message);
-    res.status(500).send("Server error");
+    res.status(500).send("Server Error");
   }
 }
 
 async function logout(req, res) {
-  if (req.session) {
-    req.session.destroy((err) => {
-      if (err) {
-        console.error("Session destruction error:", err); // Log the error
-        return res.status(500).send("Could not log out, please try again.");
-      }
-      res.clearCookie("connect.sid"); // Clears the session cookie
-      return res.status(200).json({ msg: "Logged out successfully" });
-    });
-  } else {
-    // If no session exists, just clear any potential session cookie
-    res.clearCookie("connect.sid");
-    res.status(200).json({ msg: "Already logged out or no active session." });
-  }
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send("Logout failed.");
+    }
+    res.clearCookie("connect.sid"); 
+    return res.status(200).json({ msg: "Logged out" });
+  });
 }
 
 async function updateUserProfile(req, res) {
-    // Handle multipart form data fields
     const { name, mobile, location } = req.body;
     
     try {
-        let user = await User.findById(req.session.userId || req.user.id);
+        let user = await User.findById(req.session.userId);
         if (!user) return res.status(404).json({ msg: "User not found" });
 
         if (name) user.name = name;
         if (mobile) user.mobile = mobile;
         
-        // Handle Location (it might come as a JSON string if sent via FormData)
         if (location) {
              let locObj = location;
              if (typeof location === 'string') {
                  try {
                      locObj = JSON.parse(location);
                  } catch (e) {
-                     console.error("Error parsing location JSON", e);
+                     console.error("Location parse error", e);
                  }
              }
 
@@ -128,15 +115,12 @@ async function updateUserProfile(req, res) {
              }
         }
 
-        // Handle Profile Image
         if (req.file) {
-            // Store relative path
             user.profileImage = req.file.path.replace(/\\/g, "/"); 
         }
 
         await user.save();
 
-        // Update session user payload if using session
         if(req.session && req.session.user) {
              req.session.user.name = user.name;
              req.session.user.mobile = user.mobile;
@@ -149,10 +133,12 @@ async function updateUserProfile(req, res) {
             email: user.email,
             mobile: user.mobile,
             location: user.location,
+            roles: user.roles, // Ensure updated roles are returned
             profileImage: user.profileImage
         };
 
         res.json({ user: userPayload });
+
     } catch (err) {
         console.error(err.message);
         res.status(500).send("Server error");

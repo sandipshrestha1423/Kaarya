@@ -11,8 +11,13 @@ const serviceSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['offer', 'request'], // offer = I can do X, request = I need X
+    enum: ['offer', 'request'], 
     default: 'request'
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'active', 'rejected'],
+    default: 'pending' // Services must be approved by admin
   },
   fee: {
     type: Number,
@@ -24,11 +29,11 @@ const serviceSchema = new mongoose.Schema({
     required: true,
   },
   preferredTime: {
-    type: String, // e.g., "Morning", "9AM-5PM"
+    type: String,
     required: true,
   },
   preferredDay: {
-    type: String, // e.g., "Weekends", "Monday"
+    type: String,
     required: true,
   },
   description: {

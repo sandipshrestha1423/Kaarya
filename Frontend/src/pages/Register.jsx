@@ -1,57 +1,63 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import api from "../api/api";
-import LocationPicker from "../components/LocationPicker";
+import api from "../api/api"; 
+import LocationPicker from "../components/LocationPicker"; 
 
 function Register() {
-  const [form, setForm] = useState({ name: "", email: "", password: "", role: "seeker" });
-  const [location, setLocation] = useState(null);
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [location, setLocation] = useState(null); 
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const { login } = useAuth(); // Use context
+  
+  const navigate = useNavigate(); 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
   
   const handleLocationSelect = (loc) => {
-      setLocation(loc);
+      setLocation(loc); 
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!location) {
+        setError("Please select your location on the map.");
+        return;
+    }
+
     try {
-      // Include location in the payload
       const payload = { ...form, location };
       const res = await api.post("/auth/register", payload);
-      login(res.data.user); // Log user in immediately via context
-      navigate("/");
+      
+      setMessage(res.data.msg);
+      setError("");
+      setTimeout(() => navigate("/login"), 3000);
+      
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(err.response?.data?.msg || "Registration failed. Try again!");
+      setMessage("");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300">
-      <div className="max-w-6xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="max-w-6xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row-reverse">
         
-        {/* Right Side - Visual (Reversed for Register) */}
         <div className="md:w-5/12 bg-linear-to-br from-purple-600 to-pink-600 p-10 text-white flex flex-col justify-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-full h-full bg-white opacity-10 transform skew-x-12"></div>
           <div className="relative z-10">
             <h2 className="text-4xl font-extrabold mb-4">Join Us!</h2>
             <p className="text-purple-100 mb-8">
-              Start your journey with Kaarya. Discover local opportunities and build connections.
+              Start your journey with Kaarya. Discover local opportunities and build connections in your community.
             </p>
             <div className="w-20 h-2 bg-white rounded-full mb-8"></div>
              <p className="text-sm text-purple-200">
-              "The power of community to create health is far greater than any physician, clinic or hospital."
+              "The power of community to create value is limitless."
             </p>
           </div>
         </div>
 
-        {/* Left Side - Form */}
         <div className="md:w-7/12 p-8 md:p-12 overflow-y-auto max-h-screen">
           <div className="text-center md:text-left mb-8">
             <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Create an Account</h3>
@@ -59,8 +65,14 @@ function Register() {
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-6 text-center">
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-6 text-center border border-red-200">
               {error}
+            </div>
+          )}
+
+          {message && (
+            <div className="bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 p-3 rounded-lg text-sm mb-6 text-center border border-green-200">
+              {message}
             </div>
           )}
 
@@ -71,11 +83,11 @@ function Register() {
                   <input
                     name="name"
                     type="text"
-                    placeholder="John Doe"
+                    placeholder="e.g. John Doe"
                     value={form.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none dark:text-white"
                   />
                 </div>
 
@@ -88,7 +100,7 @@ function Register() {
                     value={form.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none dark:text-white"
                   />
                 </div>
             </div>
@@ -98,11 +110,11 @@ function Register() {
               <input
                 name="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Choose a strong password"
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-purple-500 outline-none dark:text-white"
               />
             </div>
 
@@ -110,16 +122,19 @@ function Register() {
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Your Location <span className="text-xs text-gray-500 font-normal">(Click on map to select)</span>
                 </label>
-                <div className="h-64 rounded-xl overflow-hidden z-0">
+                <div className="h-64 rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
                     <LocationPicker onLocationSelect={handleLocationSelect} />
                 </div>
+                {location && (
+                    <p className="mt-2 text-xs text-green-600 font-medium">📍 {location.address}</p>
+                )}
             </div>
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-purple-600 text-white font-bold rounded-xl shadow-lg hover:bg-purple-700 hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              className="w-full py-3.5 bg-purple-600 text-white font-bold rounded-xl shadow-lg hover:bg-purple-700 transition-all duration-200"
             >
-              Register
+              Register Now
             </button>
           </form>
 
@@ -133,6 +148,6 @@ function Register() {
       </div>
     </div>
   );
-};
+}
 
 export default Register;

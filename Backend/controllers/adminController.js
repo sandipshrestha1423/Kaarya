@@ -1,4 +1,6 @@
 const Admin = require("../models/Admin");
+const User = require("../models/User");
+const Service = require("../models/Service");
 const bcrypt = require("bcryptjs");
 
 async function registerAdmin(req, res) {
@@ -68,21 +70,68 @@ async function logoutAdmin(req, res) {
     if (req.session) {
       req.session.destroy((err) => {
         if (err) {
-          console.error("Session destruction error:", err); // Log the error
+          console.error("Session destruction error:", err); 
           return res.status(500).send("Could not log out, please try again.");
         }
-        res.clearCookie("connect.sid"); // Clears the session cookie
+        res.clearCookie("connect.sid"); 
         return res.status(200).json({ msg: "Logged out successfully" });
       });
     } else {
-      // If no session exists, just clear any potential session cookie
       res.clearCookie("connect.sid");
-      return res.status(200).json({ msg: "Already logged out or no active session." });
+      return res.status(200).json({ msg: "Already logged out" });
+    }
+}
+
+// --- NEW ADMIN FUNCTIONS ---
+
+async function getPendingUsers(req, res) {
+    try {
+        const users = await User.find({ status: 'pending' });
+        res.json(users);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+}
+
+async function verifyUser(req, res) {
+    const { userId, status } = req.body; // status: 'active' or 'rejected'
+    try {
+        const user = await User.findByIdAndUpdate(userId, { status }, { new: true });
+        res.json(user);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+}
+
+async function getPendingServices(req, res) {
+    try {
+        const services = await Service.find({ status: 'pending' }).populate('user', 'name email');
+        res.json(services);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
+    }
+}
+
+async function verifyService(req, res) {
+    const { serviceId, status } = req.body; // status: 'active' or 'rejected'
+    try {
+        const service = await Service.findByIdAndUpdate(serviceId, { status }, { new: true });
+        res.json(service);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Server Error");
     }
 }
 
 module.exports = {
   registerAdmin,
   loginAdmin,
-  logoutAdmin
+  logoutAdmin,
+  getPendingUsers,
+  verifyUser,
+  getPendingServices,
+  verifyService
 };

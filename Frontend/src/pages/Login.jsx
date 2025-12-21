@@ -1,36 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import api from "../api/api";
+import { useAuth } from "../context/AuthContext"; 
+import api from "../api/api"; 
 
 function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const { login } = useAuth(); // Get login function from context
+  const navigate = useNavigate(); 
+  const { login } = useAuth(); 
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); 
     try {
       const res = await api.post("/auth/login", form);
-      login(res.data.user); // Update context state
+      
+      login(res.data.user);
       navigate("/"); 
+      
     } catch (err) {
-      setError(err.response?.data?.message || "Invalid credentials");
+      setError(err.response?.data?.msg || "Invalid email or password. Please try again.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300">
-      <div className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row transition-colors duration-300">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <div className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
         
-        {/* Left Side - Visual */}
-        <div className="md:w-1/2 bg-gradient-to-br from-indigo-600 to-purple-700 p-10 text-white flex flex-col justify-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-white opacity-10 transform -skew-x-12"></div>
+        <div className="md:w-1/2 bg-linear-to-br from-indigo-600 to-purple-700 p-10 text-white flex flex-col justify-center relative overflow-hidden">
           <div className="relative z-10">
             <h2 className="text-4xl font-extrabold mb-4">Welcome Back!</h2>
             <p className="text-indigo-100 mb-8">
@@ -43,7 +43,6 @@ function Login() {
           </div>
         </div>
 
-        {/* Right Side - Form */}
         <div className="md:w-1/2 p-8 md:p-12">
           <div className="text-center md:text-left mb-8">
             <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Login to Kaarya</h3>
@@ -51,7 +50,7 @@ function Login() {
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-6 text-center">
+            <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-6 text-center border border-red-200">
               {error}
             </div>
           )}
@@ -66,7 +65,7 @@ function Login() {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
               />
             </div>
             
@@ -75,17 +74,17 @@ function Login() {
               <input
                 name="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Your secret password"
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:bg-white dark:focus:bg-gray-600 dark:text-white transition-all outline-none"
+                className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+              className="w-full py-3.5 bg-indigo-600 text-white font-bold rounded-xl shadow-lg hover:bg-indigo-700 transition-all duration-200"
             >
               Sign In
             </button>
@@ -104,4 +103,3 @@ function Login() {
 }
 
 export default Login;
-

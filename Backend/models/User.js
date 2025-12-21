@@ -15,16 +15,23 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  role: {
+  // Roles is now an array. Everyone starts as just a 'user'.
+  // As they post services, we can add 'seeker' or 'provider' here.
+  roles: {
+    type: [String],
+    enum: ['user', 'seeker', 'provider', 'admin'], 
+    default: ['user']
+  },
+  status: {
     type: String,
-    enum: ['seeker', 'provider', 'both'],
-    default: 'seeker'
+    enum: ['pending', 'active', 'rejected'],
+    default: 'pending' 
   },
   mobile: {
     type: String,
   },
   profileImage: {
-    type: String,
+    type: String, 
   },
   location: {
     type: {
@@ -33,19 +40,20 @@ const UserSchema = new mongoose.Schema({
       default: 'Point',
     },
     coordinates: {
-      type: [Number], // [longitude, latitude]
-      index: '2dsphere',
+      type: [Number], 
+      index: '2dsphere', 
     },
     address: {
-      type: String,
+      type: String, 
     },
   },
 });
 
-UserSchema.pre('save', async function preSaveHook(next) {
+UserSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     return next();
   }
+  
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
