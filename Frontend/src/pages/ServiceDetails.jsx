@@ -11,12 +11,34 @@ function ServiceDetails() {
   const [service, setService] = useState(null); 
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(""); 
+  const [requestStatus, setRequestStatus] = useState(null); // 'pending', 'accepted', 'rejected', or null
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
+    const checkAdmin = () => {
+        const admin = localStorage.getItem("admin");
+        setIsAdmin(!!admin);
+    };
+    checkAdmin();
+
     const fetchService = async () => {
       try {
         const res = await api.get(`/services/${id}`);
         setService(res.data);
+        
+        if (authUser && !isAdmin) {
+            try {
+                const requestsRes = await api.get('/gig-requests/requester');
+                const myRequest = requestsRes.data.find(req => req.service._id === id || req.service === id);
+                if (myRequest) {
+                    setRequestStatus(myRequest.status);
+                }
+            } catch (reqErr) {
+                console.error("Error fetching requests", reqErr);
+            }
+        }
+
       } catch (err) {
         console.error(err);
         setError("Could not load service details.");
@@ -25,7 +47,25 @@ function ServiceDetails() {
       }
     };
     fetchService();
-  }, [id]);
+  }, [id, authUser, isAdmin]);
+
+  const handleRequestGig = async () => {
+      if (!authUser) {
+          navigate('/login');
+          return;
+      }
+      setProcessing(true);
+      try {
+          await api.post('/gig-requests', { serviceId: id, message: "I'm interested in this service." });
+          setRequestStatus('pending');
+          alert("Request sent successfully!");
+      } catch (err) {
+          console.error(err);
+          alert(err.response?.data?.msg || "Failed to send request.");
+      } finally {
+          setProcessing(false);
+      }
+  };
 
   const handleContact = () => {
       if (!authUser) { 
@@ -61,6 +101,9 @@ function ServiceDetails() {
       }
       return null;
   };
+  
+  const isOwner = authUser && user && authUser._id === user._id;
+  const showPhone = isAdmin || (requestStatus === 'accepted') || isOwner;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -91,11 +134,11 @@ function ServiceDetails() {
                    </div>
                </div>
 
-               <div className="mt-4 md:mt-0">
+               {/* <div className="mt-4 md:mt-0">
                     <span className={`inline-block px-4 py-2 rounded-lg font-bold text-white shadow-md ${type === 'offer' ? 'bg-purple-600' : 'bg-blue-600'}`}>
                         {type === 'offer' ? 'Offer' : 'Request'}
                     </span>
-               </div>
+               </div> */}
            </div>
 
            <div className="grid md:grid-cols-3 gap-8">
@@ -142,7 +185,7 @@ function ServiceDetails() {
                                </p>
                            </div>
                            
-                           {user?.mobile && (
+                           {showPhone && user?.mobile && (
                                <div>
                                    <p className="text-sm text-gray-500 dark:text-gray-400">Mobile</p>
                                    <p className="text-indigo-600 dark:text-indigo-400 font-medium">
@@ -151,9 +194,31 @@ function ServiceDetails() {
                                </div>
                            )}
                            
+                           {!isOwner && !isAdmin && (
+                               <>
+                                   {requestStatus ? (
+                                       <div className={`mt-4 py-3 text-center font-bold rounded-xl ${
+                                           requestStatus === 'accepted' ? 'bg-green-100 text-green-700' :
+                                           requestStatus === 'rejected' ? 'bg-red-100 text-red-700' :
+                                           'bg-yellow-100 text-yellow-700'
+                                       }`}>
+                                           Request {requestStatus.charAt(0).toUpperCase() + requestStatus.slice(1)}
+                                       </div>
+                                   ) : (
+                                       <button 
+                                            onClick={handleRequestGig}
+                                            disabled={processing}
+                                            className="w-full mt-4 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow hover:bg-indigo-700 transition"
+                                       >
+                                           {processing ? 'Sending...' : 'Request Gig'}
+                                       </button>
+                                   )}
+                               </>
+                           )}
+                           
                            <button 
                                 onClick={handleContact}
-                                className="w-full mt-4 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow hover:bg-indigo-700 transition"
+                                className="w-full mt-2 py-3 bg-white border-2 border-indigo-600 text-indigo-600 font-bold rounded-xl shadow hover:bg-indigo-50 transition"
                            >
                                Message Now
                            </button>

@@ -107,7 +107,7 @@ async function verifyUser(req, res) {
 
 async function getPendingServices(req, res) {
     try {
-        const services = await Service.find({ status: 'pending' }).populate('user', 'name email');
+        const services = await Service.find({ status: 'pending' }).populate('user', 'name email mobile');
         res.json(services);
     } catch (err) {
         console.error(err);

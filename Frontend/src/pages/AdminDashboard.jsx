@@ -79,6 +79,7 @@ function AdminDashboard() {
                             <div>
                                 <p className="font-bold">{user.name}</p>
                                 <p className="text-sm text-gray-400">{user.email}</p>
+                                <p className="text-sm text-gray-400">{user.mobile || "No Mobile"}</p>
                                 <div className="flex gap-1 mt-1">
                                     {user.roles && user.roles.map(role => (
                                         <span key={role} className="text-xs bg-gray-600 px-1 rounded uppercase text-blue-300">{role}</span>
@@ -130,8 +131,19 @@ function AdminDashboard() {
                                 </div>
                             </div>
                             <p className="text-sm text-gray-400 line-clamp-2 mb-2">{service.description}</p>
+                            
+                            {service.type === 'offer' && (
+                                <div className="mb-2 p-2 bg-gray-800 rounded text-xs border border-gray-600">
+                                    {service.skills && <p><span className="text-gray-400">Skills:</span> {service.skills}</p>}
+                                    {service.experience && <p><span className="text-gray-400">Exp:</span> {service.experience}</p>}
+                                    {service.education && <p><span className="text-gray-400">Edu:</span> {service.education}</p>}
+                                    {service.certifications && <p><span className="text-gray-400">Cert:</span> {service.certifications}</p>}
+                                </div>
+                            )}
+
                             <div className="text-xs text-gray-500">
-                                Posted by: {service.user?.name || "Unknown"}
+                                Posted by: {service.user?.name || "Unknown"} <br/>
+                                <span className="text-gray-400">Mobile: {service.user?.mobile || "N/A"}</span>
                             </div>
                         </div>
                     ))}

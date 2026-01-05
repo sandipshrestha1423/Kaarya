@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import { useAuth } from "../context/AuthContext";
 
 function PostService() {
   const navigate = useNavigate();
+  const { user, updateUser } = useAuth();
   const [formData, setFormData] = useState({
     title: "",
     category: "",
@@ -12,10 +14,21 @@ function PostService() {
     fee: "",
     feeUnit: "Hour",
     preferredTime: "",
-    preferredDay: ""
+    preferredDay: "",
+    mobile: "",
+    skills: "",
+    experience: "",
+    education: "",
+    certifications: ""
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user && user.mobile) {
+      setFormData(prev => ({ ...prev, mobile: user.mobile }));
+    }
+  }, [user]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,16 +45,23 @@ function PostService() {
 
     try {
       await api.post("/services", formData);
-      setMessage("Service posted successfully!");
+      
+      // Update local user context if mobile was added/changed
+      if (user && (!user.mobile || user.mobile !== formData.mobile)) {
+          updateUser({ mobile: formData.mobile });
+      }
+
+      setMessage("Service Admin le Verify garey paxi Post hunxa... Wait For Approval. Success ghyar ghyar ghyar!");
       setFormData({ 
           title: "", category: "", description: "", type: "request",
-          fee: "", feeUnit: "Hour", preferredTime: "", preferredDay: ""
+          fee: "", feeUnit: "Hour", preferredTime: "", preferredDay: "", mobile: "",
+          skills: "", experience: "", education: "", certifications: ""
       });
-      setTimeout(() => navigate("/"), 1500);
+      setTimeout(() => navigate("/"), 5000);
     } catch (err) {
       console.error(err);
       setMessage(
-        err.response?.data?.msg || "Error posting service. Please try again."
+        err.response?.data?.msg || "Service Post garna mildaina. Pheri try ghyar ghyar ghyar!"
       );
     } finally {
       setLoading(false);
@@ -155,7 +175,76 @@ function PostService() {
                         </select>
                     </div>
                 </div>
+                 <div>
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Mobile Number</label>
+                  <input
+                    type="tel"
+                    name="mobile"
+                    placeholder="e.g. 9841XXXXXX"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                    required
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
+                  />
+                </div>
             </div>
+
+            {/* Provider Verification Details - Only for Offers */}
+            {formData.type === 'offer' && (
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-6 rounded-xl border border-indigo-100 dark:border-indigo-800 space-y-4">
+                    <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-200">Qualifications & Verification</h3>
+                    <p className="text-sm text-indigo-700 dark:text-indigo-300 -mt-2 mb-2">Please provide details to help us verify your expertise.</p>
+                    
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Skills (Comma Separated)</label>
+                        <input
+                            type="text"
+                            name="skills"
+                            placeholder="e.g. Pipe fitting, Leak detection, Installation"
+                            value={formData.skills}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
+                        />
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         <div>
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Experience (Years/Level)</label>
+                            <input
+                                type="text"
+                                name="experience"
+                                placeholder="e.g. 5 Years"
+                                value={formData.experience}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Education</label>
+                            <input
+                                type="text"
+                                name="education"
+                                placeholder="e.g. High School, Vocational Training"
+                                value={formData.education}
+                                onChange={handleChange}
+                                className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
+                            />
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Certifications / Licenses</label>
+                        <input
+                            type="text"
+                            name="certifications"
+                            placeholder="e.g. Certified Plumber License #12345"
+                            value={formData.certifications}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white"
+                        />
+                    </div>
+                </div>
+            )}
 
              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>

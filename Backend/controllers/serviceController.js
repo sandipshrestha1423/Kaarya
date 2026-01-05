@@ -2,12 +2,21 @@ const Service = require("../models/Service");
 const User = require("../models/User");
 
 exports.createService = async (req, res) => {
-  const { title, category, description, type, fee, feeUnit, preferredTime, preferredDay } = req.body;
+  const { title, category, description, type, fee, feeUnit, preferredTime, preferredDay, mobile, skills, experience, education, certifications } = req.body;
 
   try {
     const user = await User.findById(req.user.id);
     if (!user) {
         return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Ensure mobile is present if not already in profile
+    if (!user.mobile) {
+        if (!mobile) {
+            return res.status(400).json({ msg: "Please provide a phone number for your profile to post a service." });
+        }
+        user.mobile = mobile;
+        await user.save();
     }
 
     const userLocationStr = user.location && user.location.address 
@@ -24,6 +33,10 @@ exports.createService = async (req, res) => {
       feeUnit,
       preferredTime,
       preferredDay,
+      skills,
+      experience,
+      education,
+      certifications,
       user: req.user.id, 
       status: 'pending' 
     });
@@ -84,7 +97,7 @@ exports.getServiceById = async (req, res) => {
 
 exports.updateService = async (req, res) => {
   try {
-    const { title, description, category, fee, feeUnit, preferredTime, preferredDay } = req.body;
+    const { title, description, category, fee, feeUnit, preferredTime, preferredDay, skills, experience, education, certifications } = req.body;
     
     let service = await Service.findById(req.params.id);
     if (!service) {
@@ -97,7 +110,7 @@ exports.updateService = async (req, res) => {
 
     service = await Service.findByIdAndUpdate(
       req.params.id,
-      { $set: { title, description, category, fee, feeUnit, preferredTime, preferredDay } },
+      { $set: { title, description, category, fee, feeUnit, preferredTime, preferredDay, skills, experience, education, certifications } },
       { new: true } 
     );
 

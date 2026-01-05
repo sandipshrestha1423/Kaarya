@@ -44,6 +44,19 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // Qualification Details (Mainly for 'offer' type)
+  skills: {
+    type: String, 
+  },
+  experience: {
+    type: String, 
+  },
+  education: {
+    type: String, 
+  },
+  certifications: {
+    type: String, 
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

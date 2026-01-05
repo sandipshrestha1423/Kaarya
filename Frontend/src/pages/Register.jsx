@@ -44,7 +44,7 @@ function Register() {
       setTimeout(() => navigate("/login"), 3000);
       
     } catch (err) {
-      setError(err.response?.data?.msg || "Registration failed. Try again!");
+      setError(err.response?.data?.msg || "Registration Vayena");
       setMessage("");
     }
   };

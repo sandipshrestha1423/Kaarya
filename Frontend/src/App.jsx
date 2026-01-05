@@ -15,6 +15,7 @@ import ServiceDetails from "./pages/ServiceDetails";
 import Messages from "./pages/Messages";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Requests from "./pages/Requests";
 
 function App() {
   return (
@@ -37,6 +38,14 @@ function App() {
              element={
                 <ProtectedRoute>
                    <Messages />
+                </ProtectedRoute>
+             } 
+          />
+          <Route
+             path="/requests"
+             element={
+                <ProtectedRoute>
+                   <Requests />
                 </ProtectedRoute>
              } 
           />
